@@ -205,6 +205,22 @@ h1, h2, h3, h4, h5, h6 {
   100% { background-position: 200% 0; }
 }
 
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform var(--transition-slow);
+  overflow-y: auto;
+  will-change: transform;
+}
+
 .animate-fadeIn {
   animation: fadeIn 0.4s ease forwards;
 }
@@ -226,6 +242,7 @@ h1, h2, h3, h4, h5, h6 {
   display: flex;
   flex-direction: column;
   transition: margin-left var(--transition-slow);
+  will-change: margin-left;
 }
 
 .pageContent {

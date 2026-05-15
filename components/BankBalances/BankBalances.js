@@ -1,10 +1,11 @@
 'use client';
+import React from 'react';
 import { Landmark } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { BANK_CONFIG } from '@/config/categories';
 import styles from './BankBalances.module.css';
 
-export default function BankBalances({ balances }) {
+const BankBalances = React.memo(function BankBalances({ balances }) {
   const total = balances?.reduce((sum, b) => sum + b.balance, 0) || 0;
 
   return (
@@ -39,4 +40,6 @@ export default function BankBalances({ balances }) {
       </div>
     </div>
   );
-}
+});
+
+export default BankBalances;

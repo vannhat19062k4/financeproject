@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Info } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -17,7 +18,7 @@ const CustomTooltip = ({ active, payload }) => {
   );
 };
 
-export default function CategoryDonut({ data }) {
+const CategoryDonut = React.memo(function CategoryDonut({ data }) {
   const total = data?.reduce((sum, d) => sum + d.value, 0) || 0;
 
   return (
@@ -62,4 +63,6 @@ export default function CategoryDonut({ data }) {
       </div>
     </div>
   );
-}
+});
+
+export default CategoryDonut;

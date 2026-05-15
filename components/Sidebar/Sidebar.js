@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { LayoutDashboard, ArrowLeftRight, Landmark, BarChart3, Settings, HelpCircle, Menu, X, Wallet } from 'lucide-react';
 import styles from './Sidebar.module.css';
 
@@ -16,7 +17,7 @@ const SETTINGS_ITEMS = [
   { id: 'help', label: 'Trợ giúp', icon: 'HelpCircle' },
 ];
 
-export default function Sidebar({ activeMenu = 'dashboard', onMenuChange, isOpen, onToggle }) {
+const Sidebar = React.memo(function Sidebar({ activeMenu = 'dashboard', onMenuChange, isOpen, onToggle }) {
   return (
     <>
       <button className={styles.mobileToggle} onClick={onToggle} aria-label="Toggle menu">
@@ -76,4 +77,6 @@ export default function Sidebar({ activeMenu = 'dashboard', onMenuChange, isOpen
       </aside>
     </>
   );
-}
+});
+
+export default Sidebar;

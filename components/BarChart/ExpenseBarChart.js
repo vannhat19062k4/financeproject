@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { Info, Calendar } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
@@ -18,7 +18,7 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-export default function ExpenseBarChart({ data }) {
+const ExpenseBarChart = React.memo(function ExpenseBarChart({ data }) {
   const [view, setView] = useState('month');
 
   return (
@@ -60,4 +60,6 @@ export default function ExpenseBarChart({ data }) {
       )}
     </div>
   );
-}
+});
+
+export default ExpenseBarChart;

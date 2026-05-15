@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Check, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import styles from './Header.module.css';
 
@@ -14,8 +14,7 @@ function formatRange(start, end) {
   return `${fmt(start)} – ${fmt(end)}`;
 }
 
-export default function Header({ dateRange, onDatePickerOpen }) {
-  const [autoRefresh, setAutoRefresh] = useState(true);
+const Header = React.memo(function Header({ dateRange, onDatePickerOpen, autoRefresh, onAutoRefreshToggle }) {
   const [greeting, setGreeting] = useState('Xin chào');
 
   useEffect(() => {
@@ -32,7 +31,7 @@ export default function Header({ dateRange, onDatePickerOpen }) {
       </div>
 
       <div className={styles.actions}>
-        <button className={styles.autoRefresh} onClick={() => setAutoRefresh(!autoRefresh)}>
+        <button className={styles.autoRefresh} onClick={onAutoRefreshToggle}>
           <span className={`${styles.checkbox} ${autoRefresh ? styles.checkboxChecked : ''}`}>
             {autoRefresh && <Check size={12} />}
           </span>
@@ -52,4 +51,6 @@ export default function Header({ dateRange, onDatePickerOpen }) {
       </div>
     </header>
   );
-}
+});
+
+export default Header;

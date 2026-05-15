@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Search, SlidersHorizontal, Download, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDate } from '@/utils/dateUtils';
@@ -8,8 +8,9 @@ import styles from './TransactionTable.module.css';
 
 const PAGE_SIZE = 10;
 
-export default function TransactionTable({ transactions }) {
-  const [search, setSearch] = useState('');
+const TransactionTable = React.memo(function TransactionTable({ transactions }) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [filterType, setFilterType] = useState('all');
   const [filterBank, setFilterBank] = useState('all');
@@ -17,10 +18,18 @@ export default function TransactionTable({ transactions }) {
   const [sortDir, setSortDir] = useState('desc');
   const [page, setPage] = useState(1);
 
+  // Debounce search input to prevent lag when typing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   const filtered = useMemo(() => {
     let result = [...(transactions || [])];
-    if (search) {
-      const q = search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter(t => t.description?.toLowerCase().includes(q) || t.category?.toLowerCase().includes(q));
     }
     if (filterType !== 'all') result = result.filter(t => t.type === filterType);
@@ -40,9 +49,9 @@ export default function TransactionTable({ transactions }) {
       return sortDir === 'asc' ? cmp : -cmp;
     });
     return result;
-  }, [transactions, search, filterType, filterBank, sortField, sortDir]);
+  }, [transactions, debouncedSearch, filterType, filterBank, sortField, sortDir]);
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE) || 1;
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleSort = (field) => {
@@ -71,8 +80,8 @@ export default function TransactionTable({ transactions }) {
       : <ChevronDown size={12} className={`${styles.sortIcon} ${styles.sortActive}`} />;
   };
 
-  const types = [...new Set(transactions?.map(t => t.type) || [])];
-  const banks = [...new Set(transactions?.map(t => t.bank) || [])];
+  const types = useMemo(() => [...new Set(transactions?.map(t => t.type) || [])], [transactions]);
+  const banks = useMemo(() => [...new Set(transactions?.map(t => t.bank) || [])], [transactions]);
 
   return (
     <div className={styles.container}>
@@ -81,8 +90,8 @@ export default function TransactionTable({ transactions }) {
         <div className={styles.controls}>
           <div className={styles.searchBox}>
             <Search size={16} color="var(--text-tertiary)" />
-            <input className={styles.searchInput} placeholder="Tìm kiếm..." value={search}
-              onChange={e => { setSearch(e.target.value); setPage(1); }} />
+            <input className={styles.searchInput} placeholder="Tìm kiếm..." value={searchTerm}
+              onChange={e => { setSearchTerm(e.target.value); setPage(1); }} />
           </div>
           <button className={`${styles.filterBtn} ${showFilters ? styles.filterActive : ''}`}
             onClick={() => setShowFilters(!showFilters)}>
@@ -179,4 +188,6 @@ export default function TransactionTable({ transactions }) {
       )}
     </div>
   );
-}
+});
+
+export default TransactionTable;

@@ -64,42 +64,74 @@ function Dashboard() {
   // API URL
   const API_URL = 'https://script.google.com/macros/s/AKfycbxNdchWTKM5h6G3hePOpbDiGT6SDWugKcIUKZOxgtidzGaW6xyOOIcRvdYvHyMyTKG2Yw/exec';
 
-  useEffect(() => {
-    // Fetch data from Google Sheets
-    const fetchData = async () => {
-      try {
-        setLoadingData(true);
-        const response = await fetch(`${API_URL}?action=all`);
-        const data = await response.json();
-        
-        if (data.transactions && data.transactions.length > 0) {
-          // Parse dates correctly
-          const parsedTransactions = data.transactions.map(t => ({
+  const handleMenuChange = useCallback((menu) => {
+    setActiveMenu(menu);
+  }, []);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarOpen(prev => !prev);
+  }, []);
+
+  const openDatePicker = useCallback(() => {
+    setDatePickerOpen(true);
+  }, []);
+
+  const closeDatePicker = useCallback(() => {
+    setDatePickerOpen(false);
+  }, []);
+
+  const handleDateApply = useCallback((range) => {
+    setDateRange(range);
+  }, []);
+
+  const [autoRefresh, setAutoRefresh] = useState(true);
+
+  // Fetch data function (memoized for use in interval)
+  const fetchData = useCallback(async (showLoading = true) => {
+    try {
+      if (showLoading) setLoadingData(true);
+      const response = await fetch(`${API_URL}?action=all`);
+      const data = await response.json();
+      
+      if (data.transactions && data.transactions.length > 0) {
+        const parsedTransactions = data.transactions
+          .map(t => ({
             ...t,
-            // Convert string date back to Date object
             date: new Date(t.date)
-          }));
-          // Sort by date descending
-          parsedTransactions.sort((a, b) => b.date - a.date);
-          setTransactions(parsedTransactions);
-        }
-        
-        if (data.balances && data.balances.length > 0) {
-          setBankBalances(data.balances);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        // Fallback to mock data if fetch fails
-        setTransactions(MOCK_TRANSACTIONS);
-      } finally {
+          }))
+          .filter(t => !isNaN(t.date.getTime()));
+          
+        parsedTransactions.sort((a, b) => b.date - a.date);
+        setTransactions(parsedTransactions);
+      }
+      
+      if (data.balances && data.balances.length > 0) {
+        setBankBalances(data.balances);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      if (showLoading) setTransactions(MOCK_TRANSACTIONS);
+    } finally {
+      if (showLoading) {
         setLoadingData(false);
         setDateRange(getDateRange('ytd'));
         setMounted(true);
       }
-    };
+    }
+  }, [API_URL]);
 
-    fetchData();
-  }, []);
+  useEffect(() => {
+    fetchData(true);
+  }, [fetchData]);
+
+  // Auto-refresh interval (every 30 seconds)
+  useEffect(() => {
+    if (!autoRefresh) return;
+    const interval = setInterval(() => {
+      fetchData(false); // Silent refresh
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [autoRefresh, fetchData]);
 
   // Filter transactions by date range
   const filteredTransactions = useMemo(() => {
@@ -122,13 +154,14 @@ function Dashboard() {
   // Chart data
   const expenseByCategory = useMemo(() => getExpenseByCategory(filteredTransactions), [filteredTransactions]);
   const transactionsByType = useMemo(() => getTransactionsByType(filteredTransactions), [filteredTransactions]);
+  const monthlyTrend = useMemo(() => getMonthlyTrend(filteredTransactions), [filteredTransactions]);
 
   if (!mounted || loadingData) {
     return (
       <div className="appLayout">
-        <Sidebar activeMenu={activeMenu} onMenuChange={setActiveMenu} isOpen={sidebarOpen} onToggle={() => setSidebarOpen(!sidebarOpen)} />
+        <Sidebar activeMenu={activeMenu} onMenuChange={handleMenuChange} isOpen={sidebarOpen} onToggle={toggleSidebar} />
         <main className="mainContent">
-          <Header dateRange={null} onDatePickerOpen={() => {}} />
+          <Header dateRange={null} onDatePickerOpen={openDatePicker} />
           <div className="pageContent" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
             <div style={{ textAlign: 'center', color: 'var(--text-tertiary)' }}>
               <div style={{ fontSize: 32, marginBottom: 16 }} className={styles.pulseAnim}>⏳</div>
@@ -172,7 +205,6 @@ function Dashboard() {
         );
 
       case 'analytics':
-        const monthlyTrend = getMonthlyTrend(filteredTransactions);
         return (
           <div className="pageContent">
             <div style={{ marginBottom: 24 }}>
@@ -211,19 +243,25 @@ function Dashboard() {
     }
   };
 
+  const handleAutoRefreshToggle = useCallback(() => {
+    setAutoRefresh(prev => !prev);
+  }, []);
+
   return (
     <div className="appLayout">
       <Sidebar
         activeMenu={activeMenu}
-        onMenuChange={setActiveMenu}
+        onMenuChange={handleMenuChange}
         isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
+        onToggle={toggleSidebar}
       />
 
       <main className="mainContent">
         <Header
           dateRange={dateRange}
-          onDatePickerOpen={() => setDatePickerOpen(true)}
+          onDatePickerOpen={openDatePicker}
+          autoRefresh={autoRefresh}
+          onAutoRefreshToggle={handleAutoRefreshToggle}
         />
 
         {renderContent()}
@@ -231,8 +269,8 @@ function Dashboard() {
 
       <DateRangePicker
         isOpen={datePickerOpen}
-        onClose={() => setDatePickerOpen(false)}
-        onApply={setDateRange}
+        onClose={closeDatePicker}
+        onApply={handleDateApply}
         initialRange={dateRange}
       />
     </div>

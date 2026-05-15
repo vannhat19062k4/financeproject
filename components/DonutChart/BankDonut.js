@@ -1,9 +1,10 @@
+import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { BANK_CONFIG } from '@/config/categories';
 import styles from './BankDonut.module.css';
 
-export default function BankDonut({ data }) {
+const BankDonut = React.memo(function BankDonut({ data }) {
   if (!data || data.length === 0) {
     return (
       <div className={styles.container}>
@@ -76,4 +77,6 @@ export default function BankDonut({ data }) {
       </div>
     </div>
   );
-}
+});
+
+export default BankDonut;

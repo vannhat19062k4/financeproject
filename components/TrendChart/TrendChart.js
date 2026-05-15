@@ -1,8 +1,9 @@
+import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatCompactCurrency } from '@/utils/formatCurrency';
 import styles from './TrendChart.module.css';
 
-export default function TrendChart({ data }) {
+const TrendChart = React.memo(function TrendChart({ data }) {
   if (!data || data.length === 0) {
     return (
       <div className={styles.container}>
@@ -37,4 +38,6 @@ export default function TrendChart({ data }) {
       </div>
     </div>
   );
-}
+});
+
+export default TrendChart;

@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import { TrendingUp, TrendingDown, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { formatCurrency, formatPercent } from '@/utils/formatCurrency';
 import styles from './KPICard.module.css';
@@ -10,7 +11,7 @@ const CARD_CONFIG = [
   { key: 'savingsRate', label: 'Tỷ lệ Tiết kiệm', icon: PiggyBank, changeKey: 'savingsRateChange', iconBg: '#ECFEFF', iconColor: '#06B6D4', isPercent: true },
 ];
 
-export default function KPICards({ kpis }) {
+const KPICards = React.memo(function KPICards({ kpis }) {
   return (
     <div className={styles.grid}>
       {CARD_CONFIG.map((config) => {
@@ -44,4 +45,6 @@ export default function KPICards({ kpis }) {
       })}
     </div>
   );
-}
+});
+
+export default KPICards;
