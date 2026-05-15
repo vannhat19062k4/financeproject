@@ -34,6 +34,14 @@
   flex-shrink: 0;
 }
 
+.logoImg {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
 .logoText {
   font-size: 18px;
   font-weight: 700;

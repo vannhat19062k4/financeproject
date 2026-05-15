@@ -17,6 +17,16 @@
   gap: 20px;
 }
 
+.pulseAnim {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 @media (max-width: 1200px) {
   .dashboardGrid {
     grid-template-columns: 1fr;

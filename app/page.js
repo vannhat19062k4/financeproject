@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import Sidebar from '@/components/Sidebar/Sidebar';
 import Header from '@/components/Header/Header';
 import KPICards from '@/components/KPICard/KPICard';
@@ -156,6 +156,10 @@ function Dashboard() {
   const transactionsByType = useMemo(() => getTransactionsByType(filteredTransactions), [filteredTransactions]);
   const monthlyTrend = useMemo(() => getMonthlyTrend(filteredTransactions), [filteredTransactions]);
 
+  const handleAutoRefreshToggle = useCallback(() => {
+    setAutoRefresh(prev => !prev);
+  }, []);
+
   if (!mounted || loadingData) {
     return (
       <div className="appLayout">
@@ -166,14 +170,6 @@ function Dashboard() {
             <div style={{ textAlign: 'center', color: 'var(--text-tertiary)' }}>
               <div style={{ fontSize: 32, marginBottom: 16 }} className={styles.pulseAnim}>⏳</div>
               <div style={{ fontSize: 16 }}>Đang đồng bộ dữ liệu từ Google Sheets...</div>
-              <style dangerouslySetInnerHTML={{__html: `
-                @keyframes pulse {
-                  0% { transform: scale(1); opacity: 1; }
-                  50% { transform: scale(1.2); opacity: 0.7; }
-                  100% { transform: scale(1); opacity: 1; }
-                }
-                .${styles.pulseAnim} { animation: pulse 1.5s infinite; }
-              `}} />
             </div>
           </div>
         </main>
@@ -243,9 +239,7 @@ function Dashboard() {
     }
   };
 
-  const handleAutoRefreshToggle = useCallback(() => {
-    setAutoRefresh(prev => !prev);
-  }, []);
+
 
   return (
     <div className="appLayout">

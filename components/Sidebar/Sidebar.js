@@ -28,9 +28,7 @@ const Sidebar = React.memo(function Sidebar({ activeMenu = 'dashboard', onMenuCh
 
       <aside className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ''}`}>
         <div className={styles.logo}>
-          <div className={styles.logoIcon}>
-            <Wallet size={22} />
-          </div>
+          <img src="/logo-2.png" alt="FinanceFlow Logo" className={styles.logoImg} />
           <div>
             <div className={styles.logoText}>FinanceFlow</div>
             <div className={styles.logoSub}>Quản lý tài chính</div>
