@@ -11,7 +11,7 @@ import TransactionTable from '@/components/TransactionTable/TransactionTable';
 import DateRangePicker from '@/components/DateRangePicker/DateRangePicker';
 import TrendChart from '@/components/TrendChart/TrendChart';
 import { MOCK_TRANSACTIONS, MOCK_BANK_BALANCES } from '@/data/mockData';
-import { filterByDateRange, calculateKPIs, getExpenseByCategory, getTransactionsByType, getMonthlyTrend } from '@/utils/dataTransform';
+import { filterByDateRange, calculateKPIs, getTransactionsByType, getMonthlyTrend } from '@/utils/dataTransform';
 import { getDateRange } from '@/utils/dateUtils';
 import styles from './page.module.css';
 
@@ -152,7 +152,6 @@ function Dashboard() {
   const kpis = useMemo(() => calculateKPIs(filteredTransactions, previousTransactions), [filteredTransactions, previousTransactions]);
 
   // Chart data
-  const expenseByCategory = useMemo(() => getExpenseByCategory(filteredTransactions), [filteredTransactions]);
   const transactionsByType = useMemo(() => getTransactionsByType(filteredTransactions), [filteredTransactions]);
   const monthlyTrend = useMemo(() => getMonthlyTrend(filteredTransactions), [filteredTransactions]);
 
@@ -208,7 +207,7 @@ function Dashboard() {
             </div>
             <div className={styles.dashboardGrid}>
               <div className={styles.chartSection}>
-                <ExpenseBarChart data={expenseByCategory} />
+                <ExpenseBarChart transactions={filteredTransactions} />
               </div>
               <div className={styles.rightPanel}>
                 <CategoryDonut data={transactionsByType} />
@@ -225,7 +224,7 @@ function Dashboard() {
 
             <div className={styles.dashboardGrid}>
               <div className={styles.chartSection}>
-                <ExpenseBarChart data={expenseByCategory} />
+                <ExpenseBarChart transactions={filteredTransactions} />
               </div>
               <div className={styles.rightPanel}>
                 <CategoryDonut data={transactionsByType} />

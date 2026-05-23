@@ -34,8 +34,8 @@ export const MOCK_TRANSACTIONS = [
 
 export const MOCK_BANK_BALANCES = [
   { name: 'ACB', balance: -39500 },
-  { name: 'VCB', balance: 4661820 },
-  { name: 'TCB', balance: 130516 },
+  { name: 'VCB', balance: 103956 },
+  { name: 'TCB', balance: 2018570 },
   { name: 'Quỹ momo', balance: 43470000 },
   { name: 'TK Exness', balance: 0 },
   { name: 'Tiền mặt', balance: 150000 },
