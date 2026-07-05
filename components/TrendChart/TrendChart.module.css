@@ -40,3 +40,15 @@
     height: 260px;
   }
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 14px;
+  }
+  .title {
+    font-size: 14px;
+  }
+  .chartWrapper {
+    height: 200px;
+  }
+}

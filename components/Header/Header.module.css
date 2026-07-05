@@ -111,3 +111,40 @@
     font-size: 18px;
   }
 }
+
+@media (max-width: 480px) {
+  .header {
+    padding: 14px 12px 14px 52px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .greeting h1 {
+    font-size: 16px;
+  }
+  .actions {
+    width: 100%;
+    gap: 8px;
+  }
+  .dateButton {
+    flex: 1;
+    padding: 7px 10px;
+    font-size: 12px;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .dateButton span,
+  .dateButton {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .autoRefresh {
+    font-size: 12px;
+    padding: 6px 8px;
+  }
+  .customizeBtn {
+    padding: 7px 10px;
+    font-size: 12px;
+  }
+}

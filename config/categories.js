@@ -60,7 +60,7 @@ export const CATEGORY_COLORS = {
 };
 
 export const BANK_CONFIG = {
-  'ACB': { color: '#D92027', label: 'ACB' },
+  'TP': { color: '#6C3A97', label: 'TP' },
   'VCB': { color: '#00703C', label: 'Vietcombank' },
   'TCB': { color: '#0066B3', label: 'Techcombank' },
   'Quỹ momo': { color: '#A50064', label: 'Quỹ Momo' },

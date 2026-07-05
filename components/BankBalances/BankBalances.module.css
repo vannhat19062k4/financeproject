@@ -93,3 +93,31 @@
 .zero {
   color: var(--text-tertiary);
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 14px;
+  }
+  .title {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  .totalRow {
+    padding: 10px 14px;
+  }
+  .totalLabel {
+    font-size: 12px;
+  }
+  .totalValue {
+    font-size: 16px;
+  }
+  .bankItem {
+    padding: 8px 10px;
+  }
+  .bankName {
+    font-size: 12px;
+  }
+  .bankBalance {
+    font-size: 12px;
+  }
+}

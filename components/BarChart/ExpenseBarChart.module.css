@@ -75,3 +75,28 @@
     height: 260px;
   }
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 14px;
+  }
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .title {
+    font-size: 14px;
+  }
+  .viewToggle {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .toggleBtn {
+    padding: 5px 10px;
+    font-size: 11px;
+  }
+  .chartWrapper {
+    height: 220px;
+  }
+}

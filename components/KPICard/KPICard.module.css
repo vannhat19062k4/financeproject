@@ -123,9 +123,32 @@
 
 @media (max-width: 640px) {
   .grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .card {
+    padding: 14px 16px;
   }
   .cardValue {
-    font-size: 22px;
+    font-size: 20px;
+  }
+  .cardLabel {
+    font-size: 12px;
+  }
+  .cardFooter {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 380px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .card {
+    padding: 12px 14px;
+  }
+  .cardValue {
+    font-size: 18px;
   }
 }

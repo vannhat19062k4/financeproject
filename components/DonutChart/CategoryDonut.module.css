@@ -81,3 +81,34 @@
     height: 180px;
   }
 }
+
+@media (max-width: 480px) {
+  .container {
+    padding: 14px;
+  }
+  .title {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .chartWrapper {
+    height: 160px;
+  }
+  .legend {
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .legendItem {
+    font-size: 12px;
+  }
+  .legendValue {
+    font-size: 12px;
+  }
+  .legendPercent {
+    font-size: 10px;
+    padding: 1px 5px;
+    min-width: 36px;
+  }
+  .legendRight {
+    gap: 8px;
+  }
+}

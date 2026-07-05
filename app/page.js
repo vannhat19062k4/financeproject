@@ -55,7 +55,7 @@ function Dashboard() {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const [dateRange, setDateRange] = useState(null);
   const [mounted, setMounted] = useState(false);
-  
+
   // Real data state
   const [transactions, setTransactions] = useState([]);
   const [bankBalances, setBankBalances] = useState(MOCK_BANK_BALANCES); // Fallback to mock if API returns empty balances
@@ -92,7 +92,7 @@ function Dashboard() {
       if (showLoading) setLoadingData(true);
       const response = await fetch(`${API_URL}?action=all`);
       const data = await response.json();
-      
+
       if (data.transactions && data.transactions.length > 0) {
         const parsedTransactions = data.transactions
           .map(t => ({
@@ -100,11 +100,11 @@ function Dashboard() {
             date: new Date(t.date)
           }))
           .filter(t => !isNaN(t.date.getTime()));
-          
+
         parsedTransactions.sort((a, b) => b.date - a.date);
         setTransactions(parsedTransactions);
       }
-      
+
       if (data.balances && data.balances.length > 0) {
         setBankBalances(data.balances);
       }
@@ -184,7 +184,7 @@ function Dashboard() {
             <TransactionTable transactions={filteredTransactions} />
           </div>
         );
-      
+
       case 'accounts':
         return (
           <div className="pageContent">
