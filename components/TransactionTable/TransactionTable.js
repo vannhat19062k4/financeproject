@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { Search, SlidersHorizontal, Download, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { formatDate } from '@/utils/dateUtils';
-import { TRANSACTION_TYPES, BANK_CONFIG } from '@/config/categories';
+import { TRANSACTION_TYPES, getBankConfig } from '@/config/categories';
 import styles from './TransactionTable.module.css';
 
 const PAGE_SIZE = 10;
@@ -131,7 +131,7 @@ const TransactionTable = React.memo(function TransactionTable({ transactions }) 
           <tbody>
             {paginated.length > 0 ? paginated.map((t) => {
               const typeConfig = TRANSACTION_TYPES[t.type] || {};
-              const bankConfig = BANK_CONFIG[t.bank] || { color: '#6B7280' };
+              const bankConfig = getBankConfig(t.bank);
               return (
                 <tr key={t.id}>
                   <td>{t.date instanceof Date ? formatDate(t.date) : t.date}</td>
@@ -152,7 +152,7 @@ const TransactionTable = React.memo(function TransactionTable({ transactions }) 
                   <td>
                     <div className={styles.bankCell}>
                       <span className={styles.bankDot} style={{ background: bankConfig.color }} />
-                      {t.bank}
+                      {bankConfig.label || t.bank}
                     </div>
                   </td>
                 </tr>

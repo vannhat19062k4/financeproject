@@ -1,7 +1,7 @@
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { BANK_CONFIG } from '@/config/categories';
+import { getBankConfig } from '@/config/categories';
 import styles from './BankDonut.module.css';
 
 const BankDonut = React.memo(function BankDonut({ data }) {
@@ -16,16 +16,17 @@ const BankDonut = React.memo(function BankDonut({ data }) {
     );
   }
 
-  // Filter out negative balances for the pie chart and sort
+  // Show all non-zero balances in the distribution chart
   const chartData = data
-    .filter(d => d.balance > 0)
-    .sort((a, b) => b.balance - a.balance)
+    .filter(d => d.balance !== 0)
+    .sort((a, b) => Math.abs(b.balance) - Math.abs(a.balance))
     .map(d => ({
       ...d,
-      color: BANK_CONFIG[d.name]?.color || '#6B7280'
+      absBalance: Math.abs(d.balance),
+      config: getBankConfig(d.name)
     }));
 
-  const total = chartData.reduce((s, item) => s + item.balance, 0);
+  const totalAbs = chartData.reduce((s, item) => s + item.absBalance, 0);
 
   return (
     <div className={styles.container}>
@@ -41,15 +42,15 @@ const BankDonut = React.memo(function BankDonut({ data }) {
               innerRadius={60}
               outerRadius={80}
               paddingAngle={5}
-              dataKey="balance"
+              dataKey="absBalance"
               stroke="none"
             >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+                <Cell key={`cell-${index}`} fill={entry.config.color} />
               ))}
             </Pie>
             <Tooltip 
-              formatter={(value) => formatCurrency(value)}
+              formatter={(value, name, props) => [formatCurrency(props.payload.balance), props.payload.config.label]}
               contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: 'var(--shadow-md)' }}
             />
           </PieChart>
@@ -58,16 +59,18 @@ const BankDonut = React.memo(function BankDonut({ data }) {
 
       <div className={styles.legend}>
         {chartData.map((item, i) => {
-          const percent = total > 0 ? (item.balance / total) * 100 : 0;
+          const percent = totalAbs > 0 ? (item.absBalance / totalAbs) * 100 : 0;
           return (
             <div key={i} className={styles.legendItem}>
               <div className={styles.legendLeft}>
-                <span className={styles.legendDot} style={{ background: item.color }} />
-                <span className={styles.legendName}>{BANK_CONFIG[item.name]?.label || item.name}</span>
+                <span className={styles.legendDot} style={{ background: item.config.color }} />
+                <span className={styles.legendName}>{item.config.label}</span>
               </div>
               <div className={styles.legendRight}>
-                <span className={styles.legendValue}>{formatCurrency(item.balance)}</span>
-                <span className={styles.legendPercent} style={{ background: `${item.color}15`, color: item.color }}>
+                <span className={styles.legendValue} style={{ color: item.balance < 0 ? 'var(--expense)' : 'var(--text-primary)' }}>
+                  {formatCurrency(item.balance)}
+                </span>
+                <span className={styles.legendPercent} style={{ background: `${item.config.color}15`, color: item.config.color }}>
                   {percent.toFixed(1)}%
                 </span>
               </div>

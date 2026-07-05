@@ -10,6 +10,7 @@ import BankBalances from '@/components/BankBalances/BankBalances';
 import TransactionTable from '@/components/TransactionTable/TransactionTable';
 import DateRangePicker from '@/components/DateRangePicker/DateRangePicker';
 import TrendChart from '@/components/TrendChart/TrendChart';
+import TransactionDetailModal from '@/components/TransactionDetailModal/TransactionDetailModal';
 import { MOCK_TRANSACTIONS, MOCK_BANK_BALANCES } from '@/data/mockData';
 import { filterByDateRange, calculateKPIs, getTransactionsByType, getMonthlyTrend } from '@/utils/dataTransform';
 import { getDateRange } from '@/utils/dateUtils';
@@ -58,8 +59,13 @@ function Dashboard() {
 
   // Real data state
   const [transactions, setTransactions] = useState([]);
-  const [bankBalances, setBankBalances] = useState(MOCK_BANK_BALANCES); // Fallback to mock if API returns empty balances
+  const [bankBalances, setBankBalances] = useState(MOCK_BANK_BALANCES);
   const [loadingData, setLoadingData] = useState(true);
+
+  // Transaction detail modal state
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [detailFilterType, setDetailFilterType] = useState(null);
+  const [detailTitle, setDetailTitle] = useState('');
 
   // API URL
   const API_URL = 'https://script.google.com/macros/s/AKfycbxNdchWTKM5h6G3hePOpbDiGT6SDWugKcIUKZOxgtidzGaW6xyOOIcRvdYvHyMyTKG2Yw/exec';
@@ -159,6 +165,16 @@ function Dashboard() {
     setAutoRefresh(prev => !prev);
   }, []);
 
+  const handleKPICardClick = useCallback((filterType, label) => {
+    setDetailFilterType(filterType);
+    setDetailTitle(label);
+    setDetailModalOpen(true);
+  }, []);
+
+  const closeDetailModal = useCallback(() => {
+    setDetailModalOpen(false);
+  }, []);
+
   if (!mounted || loadingData) {
     return (
       <div className="appLayout">
@@ -220,7 +236,7 @@ function Dashboard() {
       default:
         return (
           <div className="pageContent">
-            <KPICards kpis={kpis} />
+            <KPICards kpis={kpis} onCardClick={handleKPICardClick} />
 
             <div className={styles.dashboardGrid}>
               <div className={styles.chartSection}>
@@ -265,6 +281,14 @@ function Dashboard() {
         onClose={closeDatePicker}
         onApply={handleDateApply}
         initialRange={dateRange}
+      />
+
+      <TransactionDetailModal
+        isOpen={detailModalOpen}
+        onClose={closeDetailModal}
+        transactions={filteredTransactions}
+        filterType={detailFilterType}
+        title={detailTitle}
       />
     </div>
   );

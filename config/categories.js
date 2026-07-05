@@ -60,13 +60,33 @@ export const CATEGORY_COLORS = {
 };
 
 export const BANK_CONFIG = {
-  'TP': { color: '#6C3A97', label: 'TP' },
+  'TP bank': { color: '#6C3A97', label: 'TP Bank' },
+  'TP Bank': { color: '#6C3A97', label: 'TP Bank' },
+  'TP': { color: '#6C3A97', label: 'TP Bank' },
   'VCB': { color: '#00703C', label: 'Vietcombank' },
   'TCB': { color: '#0066B3', label: 'Techcombank' },
   'Quỹ momo': { color: '#A50064', label: 'Quỹ Momo' },
+  'Quỹ Momo': { color: '#A50064', label: 'Quỹ Momo' },
   'TK Exness': { color: '#FFCC00', label: 'TK Exness' },
   'Tiền mặt': { color: '#6B7280', label: 'Tiền mặt' },
 };
+
+export function getBankConfig(bankName) {
+  if (!bankName) return { color: '#6B7280', label: 'Khác' };
+  const exact = BANK_CONFIG[bankName];
+  if (exact) return exact;
+  const lower = String(bankName).toLowerCase().trim();
+  for (const [key, val] of Object.entries(BANK_CONFIG)) {
+    if (key.toLowerCase() === lower) return val;
+  }
+  if (lower.includes('tp')) return { color: '#6C3A97', label: bankName };
+  if (lower.includes('vcb') || lower.includes('vietcombank')) return { color: '#00703C', label: bankName };
+  if (lower.includes('tcb') || lower.includes('techcombank')) return { color: '#0066B3', label: bankName };
+  if (lower.includes('momo')) return { color: '#A50064', label: bankName };
+  if (lower.includes('exness')) return { color: '#FFCC00', label: bankName };
+  if (lower.includes('tiền') || lower.includes('cash')) return { color: '#6B7280', label: bankName };
+  return { color: '#6B7280', label: bankName };
+}
 
 export const SIDEBAR_MENU = [
   { id: 'dashboard', label: 'Dashboard', icon: 'LayoutDashboard' },

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Landmark } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
-import { BANK_CONFIG } from '@/config/categories';
+import { getBankConfig } from '@/config/categories';
 import styles from './BankBalances.module.css';
 
 const BankBalances = React.memo(function BankBalances({ balances }) {
@@ -22,7 +22,7 @@ const BankBalances = React.memo(function BankBalances({ balances }) {
 
       <div className={styles.list}>
         {balances?.map((bank, i) => {
-          const config = BANK_CONFIG[bank.name] || { color: '#6B7280', label: bank.name };
+          const config = getBankConfig(bank.name);
           const balanceClass = bank.balance > 0 ? styles.positive : bank.balance < 0 ? styles.negative : styles.zero;
 
           return (
