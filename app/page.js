@@ -11,8 +11,8 @@ import TransactionTable from '@/components/TransactionTable/TransactionTable';
 import DateRangePicker from '@/components/DateRangePicker/DateRangePicker';
 import TrendChart from '@/components/TrendChart/TrendChart';
 import TransactionDetailModal from '@/components/TransactionDetailModal/TransactionDetailModal';
-import { MOCK_TRANSACTIONS, MOCK_BANK_BALANCES } from '@/data/mockData';
-import { filterByDateRange, calculateKPIs, getTransactionsByType, getMonthlyTrend } from '@/utils/dataTransform';
+import { MOCK_TRANSACTIONS } from '@/data/mockData';
+import { filterByDateRange, calculateKPIs, getTransactionsByType, getMonthlyTrend, calculateBankBalances } from '@/utils/dataTransform';
 import { getDateRange } from '@/utils/dateUtils';
 import styles from './page.module.css';
 
@@ -59,7 +59,6 @@ function Dashboard() {
 
   // Real data state
   const [transactions, setTransactions] = useState([]);
-  const [bankBalances, setBankBalances] = useState(MOCK_BANK_BALANCES);
   const [loadingData, setLoadingData] = useState(true);
 
   // Transaction detail modal state
@@ -111,9 +110,7 @@ function Dashboard() {
         setTransactions(parsedTransactions);
       }
 
-      if (data.balances && data.balances.length > 0) {
-        setBankBalances(data.balances);
-      }
+      // Bank balances are now calculated from transactions via useMemo
     } catch (error) {
       console.error('Error fetching data:', error);
       if (showLoading) setTransactions(MOCK_TRANSACTIONS);
@@ -160,6 +157,10 @@ function Dashboard() {
   // Chart data
   const transactionsByType = useMemo(() => getTransactionsByType(filteredTransactions), [filteredTransactions]);
   const monthlyTrend = useMemo(() => getMonthlyTrend(filteredTransactions), [filteredTransactions]);
+
+  // Bank balances: calculated from ALL transactions (not filtered by date)
+  // Groups by bank field (column G) and sums all amounts per bank
+  const bankBalances = useMemo(() => calculateBankBalances(transactions), [transactions]);
 
   const handleAutoRefreshToggle = useCallback(() => {
     setAutoRefresh(prev => !prev);
