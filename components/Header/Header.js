@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Calendar, Check, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { Calendar, Check, SlidersHorizontal, ChevronDown, RefreshCw } from 'lucide-react';
 import styles from './Header.module.css';
 
 function formatRange(start, end) {
@@ -14,8 +14,19 @@ function formatRange(start, end) {
   return `${fmt(start)} – ${fmt(end)}`;
 }
 
-const Header = React.memo(function Header({ dateRange, onDatePickerOpen, autoRefresh, onAutoRefreshToggle }) {
+function formatLastSynced(date) {
+  if (!date) return '';
+  const now = new Date();
+  const diffSec = Math.floor((now - date) / 1000);
+  if (diffSec < 5) return 'Vừa xong';
+  if (diffSec < 60) return `${diffSec}s trước`;
+  const diffMin = Math.floor(diffSec / 60);
+  return `${diffMin} phút trước`;
+}
+
+const Header = React.memo(function Header({ dateRange, onDatePickerOpen, autoRefresh, onAutoRefreshToggle, onManualRefresh, isSyncing, lastSynced }) {
   const [greeting, setGreeting] = useState('Xin chào');
+  const [, setTick] = useState(0);
 
   useEffect(() => {
     const hour = new Date().getHours();
@@ -24,6 +35,13 @@ const Header = React.memo(function Header({ dateRange, onDatePickerOpen, autoRef
     else setGreeting('Chào buổi tối');
   }, []);
 
+  // Update "last synced" display every 5 seconds
+  useEffect(() => {
+    if (!lastSynced) return;
+    const interval = setInterval(() => setTick(t => t + 1), 5000);
+    return () => clearInterval(interval);
+  }, [lastSynced]);
+
   return (
     <header className={styles.header}>
       <div className={styles.greeting}>
@@ -31,6 +49,20 @@ const Header = React.memo(function Header({ dateRange, onDatePickerOpen, autoRef
       </div>
 
       <div className={styles.actions}>
+        <button
+          className={`${styles.syncBtn} ${isSyncing ? styles.syncBtnActive : ''}`}
+          onClick={onManualRefresh}
+          disabled={isSyncing}
+          title={lastSynced ? `Đồng bộ lần cuối: ${lastSynced.toLocaleTimeString('vi-VN')}` : 'Chưa đồng bộ'}
+        >
+          <RefreshCw size={14} className={isSyncing ? styles.spinning : ''} />
+          {isSyncing ? 'Đang đồng bộ...' : 'Đồng bộ'}
+        </button>
+
+        {lastSynced && (
+          <span className={styles.lastSynced}>{formatLastSynced(lastSynced)}</span>
+        )}
+
         <button className={styles.autoRefresh} onClick={onAutoRefreshToggle}>
           <span className={`${styles.checkbox} ${autoRefresh ? styles.checkboxChecked : ''}`}>
             {autoRefresh && <Check size={12} />}
@@ -54,3 +86,4 @@ const Header = React.memo(function Header({ dateRange, onDatePickerOpen, autoRef
 });
 
 export default Header;
+

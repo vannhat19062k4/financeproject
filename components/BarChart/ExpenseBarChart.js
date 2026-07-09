@@ -1,7 +1,7 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { Info, Calendar } from 'lucide-react';
+import { Info } from 'lucide-react';
 import { formatCurrency } from '@/utils/formatCurrency';
 import { CATEGORY_COLORS } from '@/config/categories';
 import styles from './ExpenseBarChart.module.css';
@@ -19,35 +19,6 @@ const CustomTooltip = ({ active, payload, label }) => {
   );
 };
 
-function filterByView(transactions, view) {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-  if (view === 'week') {
-    const weekAgo = new Date(today);
-    weekAgo.setDate(weekAgo.getDate() - 6);
-    return transactions.filter(t => {
-      const d = t.date instanceof Date ? t.date : new Date(t.date);
-      return d >= weekAgo && d <= now;
-    });
-  }
-
-  if (view === 'month') {
-    const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-    return transactions.filter(t => {
-      const d = t.date instanceof Date ? t.date : new Date(t.date);
-      return d >= monthStart && d <= now;
-    });
-  }
-
-  // 'year' — current year (YTD)
-  const yearStart = new Date(today.getFullYear(), 0, 1);
-  return transactions.filter(t => {
-    const d = t.date instanceof Date ? t.date : new Date(t.date);
-    return d >= yearStart && d <= now;
-  });
-}
-
 function computeExpenseByCategory(transactions) {
   const grouped = {};
   transactions.filter(t => t.type === 'Chi tiêu').forEach(t => {
@@ -64,13 +35,11 @@ function computeExpenseByCategory(transactions) {
 }
 
 const ExpenseBarChart = React.memo(function ExpenseBarChart({ transactions }) {
-  const [view, setView] = useState('month');
-
+  // Use transactions directly — already filtered by DateRangePicker at page level
   const data = useMemo(() => {
     if (!transactions || transactions.length === 0) return [];
-    const filtered = filterByView(transactions, view);
-    return computeExpenseByCategory(filtered);
-  }, [transactions, view]);
+    return computeExpenseByCategory(transactions);
+  }, [transactions]);
 
   return (
     <div className={styles.container}>
@@ -78,14 +47,6 @@ const ExpenseBarChart = React.memo(function ExpenseBarChart({ transactions }) {
         <div className={styles.title}>
           Chi tiêu theo danh mục
           <Info size={16} className={styles.infoIcon} />
-        </div>
-        <div className={styles.viewToggle}>
-          <Calendar size={14} style={{ margin: '0 6px', color: 'var(--text-tertiary)' }} />
-          {['week', 'month', 'year'].map(v => (
-            <button key={v} className={`${styles.toggleBtn} ${view === v ? styles.toggleBtnActive : ''}`} onClick={() => setView(v)}>
-              {v === 'week' ? 'Tuần' : v === 'month' ? 'Tháng' : 'Năm'}
-            </button>
-          ))}
         </div>
       </div>
 
@@ -114,3 +75,4 @@ const ExpenseBarChart = React.memo(function ExpenseBarChart({ transactions }) {
 });
 
 export default ExpenseBarChart;
+

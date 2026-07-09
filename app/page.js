@@ -54,12 +54,13 @@ function Dashboard() {
   const [activeMenu, setActiveMenu] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [datePickerOpen, setDatePickerOpen] = useState(false);
-  const [dateRange, setDateRange] = useState(null);
-  const [mounted, setMounted] = useState(false);
+  const [dateRange, setDateRange] = useState(() => getDateRange('ytd'));
+  const [mounted, setMounted] = useState(true);
 
-  // Real data state
-  const [transactions, setTransactions] = useState([]);
-  const [loadingData, setLoadingData] = useState(true);
+  // Real data state — start with mock data so UI shows immediately
+  const [transactions, setTransactions] = useState(MOCK_TRANSACTIONS);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSynced, setLastSynced] = useState(null);
 
   // Transaction detail modal state
   const [detailModalOpen, setDetailModalOpen] = useState(false);
@@ -91,10 +92,10 @@ function Dashboard() {
 
   const [autoRefresh, setAutoRefresh] = useState(true);
 
-  // Fetch data function (memoized for use in interval)
-  const fetchData = useCallback(async (showLoading = true) => {
+  // Fetch data function — always silent, no blocking loading screen
+  const fetchData = useCallback(async () => {
     try {
-      if (showLoading) setLoadingData(true);
+      setIsSyncing(true);
       const response = await fetch(`${API_URL}?action=all`);
       const data = await response.json();
 
@@ -110,31 +111,32 @@ function Dashboard() {
         setTransactions(parsedTransactions);
       }
 
-      // Bank balances are now calculated from transactions via useMemo
+      setLastSynced(new Date());
     } catch (error) {
       console.error('Error fetching data:', error);
-      if (showLoading) setTransactions(MOCK_TRANSACTIONS);
     } finally {
-      if (showLoading) {
-        setLoadingData(false);
-        setDateRange(getDateRange('ytd'));
-        setMounted(true);
-      }
+      setIsSyncing(false);
     }
   }, [API_URL]);
 
+  // Fetch from API on mount (silent — UI already shows mock data)
   useEffect(() => {
-    fetchData(true);
+    fetchData();
   }, [fetchData]);
 
-  // Auto-refresh interval (every 30 seconds)
+  // Auto-refresh interval (every 10 seconds)
   useEffect(() => {
     if (!autoRefresh) return;
     const interval = setInterval(() => {
-      fetchData(false); // Silent refresh
-    }, 30000);
+      fetchData();
+    }, 10000);
     return () => clearInterval(interval);
   }, [autoRefresh, fetchData]);
+
+  // Manual refresh handler
+  const handleManualRefresh = useCallback(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Filter transactions by date range
   const filteredTransactions = useMemo(() => {
@@ -176,22 +178,7 @@ function Dashboard() {
     setDetailModalOpen(false);
   }, []);
 
-  if (!mounted || loadingData) {
-    return (
-      <div className="appLayout">
-        <Sidebar activeMenu={activeMenu} onMenuChange={handleMenuChange} isOpen={sidebarOpen} onToggle={toggleSidebar} />
-        <main className="mainContent">
-          <Header dateRange={null} onDatePickerOpen={openDatePicker} />
-          <div className="pageContent" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
-            <div style={{ textAlign: 'center', color: 'var(--text-tertiary)' }}>
-              <div style={{ fontSize: 32, marginBottom: 16 }} className={styles.pulseAnim}>⏳</div>
-              <div style={{ fontSize: 16 }}>Đang đồng bộ dữ liệu từ Google Sheets...</div>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
+  if (!mounted) return null;
 
   const renderContent = () => {
     switch (activeMenu) {
@@ -272,6 +259,9 @@ function Dashboard() {
           onDatePickerOpen={openDatePicker}
           autoRefresh={autoRefresh}
           onAutoRefreshToggle={handleAutoRefreshToggle}
+          onManualRefresh={handleManualRefresh}
+          isSyncing={isSyncing}
+          lastSynced={lastSynced}
         />
 
         {renderContent()}
